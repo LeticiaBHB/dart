@@ -1,49 +1,8 @@
 import 'dart:io';
-
-void mostrarItens(String categoria, List<String> listaselecionada) {
-  print('mostrar itens da categoria $categoria: $listaselecionada');
-}
-
-bool itemExiste(List<String> listaselecionada, String? nome) {
-  return listaselecionada.any(
-    (item) => item.toLowerCase() == nome?.toLowerCase(),
-  );
-}
-
-void adicionarItem(List<String> listaselecionada, String? novoitem) {
-  if (itemExiste(listaselecionada, novoitem)) {
-    print('este item já existe!');
-  } else {
-    listaselecionada.add(novoitem!);
-    print('item adicionado com sucesso!');
-  }
-}
-
-void filtrarporLetra(List<String> lista, String letra) {
-  var filtrados = lista
-      .where((item) => item.toLowerCase().startsWith(letra.toLowerCase()))
-      .toList();
-  print('itens que começam com "$letra":$filtrados');
-}
-
-void removerItem(List<String> lista, String? nome) {
-  if (nome == null || nome.isEmpty) {
-    print('nome inválido');
-    return;
-  }
-  int antes = lista.length;
-  lista.removeWhere((item) => item.toLowerCase() == nome.toLowerCase());
-  if (lista.length < antes) {
-    print('item removido com sucesso!');
-  } else {
-    print('item não encontrado para a remoção');
-  }
-}
-
-void quantidadeitens(List<String> lista, String nomeCategoria) {
-  print('A categoria "$nomeCategoria" tem ${lista.length} item(ns).');
-}
-
+import 'dart:convert';
+import 'funcoes.dart';
+import 'locomocao.dart';
+import 'pergaminhos.dart';
 class Item {
   String nome;
   String categoria;
@@ -103,11 +62,31 @@ void main() {
     'Lendária',
     'poções feitas para durar',
   );
+  Pergaminhos pergaminho1 = Pergaminhos ('Manuscrito das Sombras',
+  'Pergaminho',
+  'Lendária',
+  'Ensinamentos ancestrais ocultos',
+  'Mestre Oculto',
+  );
+
+  Locomocao v1 = Locomocao('vassoura simples', 'madeira', '50km');
+  Locomocao v2 = Locomocao('vassoura real', 'aço inox', '200km');
 
   List<Item> inventario = [pocoes1, pocoes2, pocoes3, pocoes4, pocoes5];
+  List<Item> relicarios = [pergaminho1];
+  List<Locomocao> vassouras = [v1,v2];
   bool continuar = true;
   List<String>? listaselecionada;
   String nomeCategoria = "";
+
+  List<Map<String,dynamic>> mapasVassouras = vassouras.map((v) => v.toMap()).toList();
+  String jsonVassouras = jsonEncode(mapasVassouras);
+  print(jsonVassouras);
+
+  File('vassouras.json').writeAsStringSync(jsonVassouras);
+  String conteudo = File('vassouras.json').readAsStringSync();
+  List<dynamic> listaLida = jsonDecode(conteudo);
+  List<Locomocao> restauradas = listaLida.map((e) => Locomocao.fromMap(e)).toList();
 
   while (continuar) {
     print('bem vindo a loja!!');
@@ -206,7 +185,57 @@ void main() {
           continue;
       }
     }
-
+    print('quer adicionar algum item na sessão de poções? s/n');
+    String? adicionarpocao = stdin.readLineSync();
+    if( adicionarpocao == 's'){
+      print('qual será o nome da poção?');
+      String? nomepocao = stdin.readLineSync();
+      print('qual será a categoria que essa poção vai estar?');
+      String? categoriapocao = stdin.readLineSync();
+      print('qual será a raridade da poção?');
+      String? raridadepocao = stdin.readLineSync();
+      print('qual írá ser a descrição da poção?');
+      String? descricaopocao = stdin.readLineSync();
+      print('está é a poção adicionada:$nomepocao, $categoriapocao, $raridadepocao $descricaopocao, deseja salvar? (s/n)');
+      String? salvarsim = stdin.readLineSync();
+      if(salvarsim == 's'){
+        Item novaPocao = Item(nomepocao ?? '', categoriapocao ?? '', raridadepocao ?? '', descricaopocao ?? '');
+        inventario.add(novaPocao);
+        print('poção adicionada com sucesso!!');
+      }
+    }
+    print('quer ir para os pergaminhos perdidos? (s/n)');
+    String? pergaminhosver = stdin.readLineSync();
+    if(pergaminhosver?.toLowerCase() == 's'){
+      print('estes são os pergaminhos mágicos $Pergaminhos');
+    }
+    print('quer ver nossa estante de pergaminhos? s/n');
+    String? estantepergaminho = stdin.readLineSync();
+    if(estantepergaminho?.toLowerCase() == 's'){
+      relicarios.forEach((item) => item.mostrar());
+    }
+    print('já viu nossas vassouras mágicas? s/n');
+    String? vassourasmagicas = stdin.readLineSync();
+    if(vassourasmagicas?.toLowerCase() == 's'){
+      print('estes são os nossas locomotivas $Locomocao');
+    }
+    print('quer adicionar mais uma locomoção? s/n');
+    String? adicionarlocomocao = stdin.readLineSync();
+    if(adicionarlocomocao?.toLowerCase() == 's'){
+      print('qual é a vassoura?');
+      String? nomevassoura = stdin.readLineSync();
+      print('qual é o material da vassoura?');
+      String? nomematerial = stdin.readLineSync();
+      print('qual a velocidade desta vassoura?');
+      String? qualvelocidade = stdin.readLineSync();
+      print('está é a locomotiva adicionada: $nomevassoura, $nomematerial,$qualvelocidade, deseja salvar? s/n');
+      String? salvarlocomotiva = stdin.readLineSync();
+      if(salvarlocomotiva == 's'){
+        Locomocao novaLocomocao = Locomocao (nomevassoura ?? '', nomematerial ?? '', qualvelocidade ?? '');
+        vassouras.add(novaLocomocao);
+        print('locomoção adicionada com sucesso!!');
+      }
+    }
     print('deseja sair? (s/n)');
     String? sair = stdin.readLineSync();
     if (sair?.toLowerCase() == 's') {
