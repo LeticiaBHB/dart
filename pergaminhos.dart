@@ -1,4 +1,5 @@
 
+import 'item.dart';
 import 'main.dart';
 
 class Pergaminhos extends Item{

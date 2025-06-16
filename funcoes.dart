@@ -1,4 +1,6 @@
 
+import 'locomocao.dart';
+
 void mostrarItens(String categoria, List<String> listaselecionada) {
   print('mostrar itens da categoria $categoria: $listaselecionada');
 }
@@ -38,6 +40,21 @@ void removerItem(List<String> lista, String? nome) {
     print('item não encontrado para a remoção');
   }
 }
+void removerLocomocao(List<Locomocao> lista, String? nome) {
+  if (nome == null || nome.isEmpty) {
+    print('nome inválido');
+    return;
+  }
+  int antes = lista.length;
+  lista.removeWhere((loc) => loc.vassoura.toLowerCase() == nome.toLowerCase());
+  if (lista.length < antes) {
+    print('locomoção removida com sucesso!');
+  } else {
+    print('locomoção não encontrada!');
+  }
+}
+
+
 
 void quantidadeitens(List<String> lista, String nomeCategoria) {
   print('A categoria "$nomeCategoria" tem ${lista.length} item(ns).');

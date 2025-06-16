@@ -1,23 +1,9 @@
 import 'dart:io';
 import 'dart:convert';
 import 'funcoes.dart';
+import 'item.dart';
 import 'locomocao.dart';
 import 'pergaminhos.dart';
-class Item {
-  String nome;
-  String categoria;
-  String raridade;
-  String descricao;
-
-  Item(this.nome, this.categoria, this.raridade, this.descricao);
-
-  void mostrar() {
-    print('🔸 $nome');
-    print('   Categoria: $categoria');
-    print('   Raridade: $raridade');
-    print('   Descrição: $descricao\n');
-  }
-}
 
 void main() {
   List<String> livros = [
@@ -62,11 +48,12 @@ void main() {
     'Lendária',
     'poções feitas para durar',
   );
-  Pergaminhos pergaminho1 = Pergaminhos ('Manuscrito das Sombras',
-  'Pergaminho',
-  'Lendária',
-  'Ensinamentos ancestrais ocultos',
-  'Mestre Oculto',
+  Pergaminhos pergaminho1 = Pergaminhos(
+    'Manuscrito das Sombras',
+    'Pergaminho',
+    'Lendária',
+    'Ensinamentos ancestrais ocultos',
+    'Mestre Oculto',
   );
 
   Locomocao v1 = Locomocao('vassoura simples', 'madeira', '50km');
@@ -74,19 +61,23 @@ void main() {
 
   List<Item> inventario = [pocoes1, pocoes2, pocoes3, pocoes4, pocoes5];
   List<Item> relicarios = [pergaminho1];
-  List<Locomocao> vassouras = [v1,v2];
+  List<Locomocao> vassouras = [v1, v2];
   bool continuar = true;
   List<String>? listaselecionada;
   String nomeCategoria = "";
 
-  List<Map<String,dynamic>> mapasVassouras = vassouras.map((v) => v.toMap()).toList();
+  List<Map<String, dynamic>> mapasVassouras = vassouras
+      .map((v) => v.toMap())
+      .toList();
   String jsonVassouras = jsonEncode(mapasVassouras);
   print(jsonVassouras);
 
   File('vassouras.json').writeAsStringSync(jsonVassouras);
   String conteudo = File('vassouras.json').readAsStringSync();
   List<dynamic> listaLida = jsonDecode(conteudo);
-  List<Locomocao> restauradas = listaLida.map((e) => Locomocao.fromMap(e)).toList();
+  List<Locomocao> restauradas = listaLida
+      .map((e) => Locomocao.fromMap(e))
+      .toList();
 
   while (continuar) {
     print('bem vindo a loja!!');
@@ -165,29 +156,29 @@ void main() {
       adquiridos.mostrar();
       inventario.forEach((item) => item.mostrar());
       print('Qual raridade quer escolher: Usual / Casual / Rara / Lendária?');
-        String? raridadeselecionada = stdin.readLineSync();
-        if (raridadeselecionada != null && raridadeselecionada.isNotEmpty) {
-          List<Item> filtrados = inventario
-              .where(
-                (item) =>
-                    item.raridade.toLowerCase() ==
-                    raridadeselecionada.toLowerCase(),
-              )
-              .toList();
-          if (filtrados.isNotEmpty) {
-            print('\n Itens com raridade "$raridadeselecionada":');
-            filtrados.forEach((item) => item.mostrar());
-          } else {
-            print('nenhum item encontrado com essa raridade');
-          }
+      String? raridadeselecionada = stdin.readLineSync();
+      if (raridadeselecionada != null && raridadeselecionada.isNotEmpty) {
+        List<Item> filtrados = inventario
+            .where(
+              (item) =>
+                  item.raridade.toLowerCase() ==
+                  raridadeselecionada.toLowerCase(),
+            )
+            .toList();
+        if (filtrados.isNotEmpty) {
+          print('\n Itens com raridade "$raridadeselecionada":');
+          filtrados.forEach((item) => item.mostrar());
         } else {
-          print('raridade inválida');
-          continue;
+          print('nenhum item encontrado com essa raridade');
+        }
+      } else {
+        print('raridade inválida');
+        continue;
       }
     }
     print('quer adicionar algum item na sessão de poções? s/n');
     String? adicionarpocao = stdin.readLineSync();
-    if( adicionarpocao == 's'){
+    if (adicionarpocao == 's') {
       print('qual será o nome da poção?');
       String? nomepocao = stdin.readLineSync();
       print('qual será a categoria que essa poção vai estar?');
@@ -196,45 +187,65 @@ void main() {
       String? raridadepocao = stdin.readLineSync();
       print('qual írá ser a descrição da poção?');
       String? descricaopocao = stdin.readLineSync();
-      print('está é a poção adicionada:$nomepocao, $categoriapocao, $raridadepocao $descricaopocao, deseja salvar? (s/n)');
+      print(
+        'está é a poção adicionada:$nomepocao, $categoriapocao, $raridadepocao $descricaopocao, deseja salvar? (s/n)',
+      );
       String? salvarsim = stdin.readLineSync();
-      if(salvarsim == 's'){
-        Item novaPocao = Item(nomepocao ?? '', categoriapocao ?? '', raridadepocao ?? '', descricaopocao ?? '');
+      if (salvarsim == 's') {
+        Item novaPocao = Item(
+          nomepocao ?? '',
+          categoriapocao ?? '',
+          raridadepocao ?? '',
+          descricaopocao ?? '',
+        );
         inventario.add(novaPocao);
         print('poção adicionada com sucesso!!');
       }
     }
     print('quer ir para os pergaminhos perdidos? (s/n)');
     String? pergaminhosver = stdin.readLineSync();
-    if(pergaminhosver?.toLowerCase() == 's'){
+    if (pergaminhosver?.toLowerCase() == 's') {
       print('estes são os pergaminhos mágicos $Pergaminhos');
     }
     print('quer ver nossa estante de pergaminhos? s/n');
     String? estantepergaminho = stdin.readLineSync();
-    if(estantepergaminho?.toLowerCase() == 's'){
+    if (estantepergaminho?.toLowerCase() == 's') {
       relicarios.forEach((item) => item.mostrar());
     }
     print('já viu nossas vassouras mágicas? s/n');
     String? vassourasmagicas = stdin.readLineSync();
-    if(vassourasmagicas?.toLowerCase() == 's'){
+    if (vassourasmagicas?.toLowerCase() == 's') {
       print('estes são os nossas locomotivas $Locomocao');
     }
     print('quer adicionar mais uma locomoção? s/n');
     String? adicionarlocomocao = stdin.readLineSync();
-    if(adicionarlocomocao?.toLowerCase() == 's'){
+    if (adicionarlocomocao?.toLowerCase() == 's') {
       print('qual é a vassoura?');
       String? nomevassoura = stdin.readLineSync();
       print('qual é o material da vassoura?');
       String? nomematerial = stdin.readLineSync();
       print('qual a velocidade desta vassoura?');
       String? qualvelocidade = stdin.readLineSync();
-      print('está é a locomotiva adicionada: $nomevassoura, $nomematerial,$qualvelocidade, deseja salvar? s/n');
+      print(
+        'está é a locomotiva adicionada: $nomevassoura, $nomematerial,$qualvelocidade, deseja salvar? s/n',
+      );
       String? salvarlocomotiva = stdin.readLineSync();
-      if(salvarlocomotiva == 's'){
-        Locomocao novaLocomocao = Locomocao (nomevassoura ?? '', nomematerial ?? '', qualvelocidade ?? '');
+      if (salvarlocomotiva == 's') {
+        Locomocao novaLocomocao = Locomocao(
+          nomevassoura ?? '',
+          nomematerial ?? '',
+          qualvelocidade ?? '',
+        );
         vassouras.add(novaLocomocao);
         print('locomoção adicionada com sucesso!!');
       }
+    }
+    print('seseja remover alguma locomotiva? s/n');
+    String? removelocomotiva = stdin.readLineSync();
+    if (removelocomotiva == 's') {
+      print('digite a locomotiva a ser excluida:');
+      String? locomotivapararemover = stdin.readLineSync();
+      removerLocomocao(vassouras, locomotivapararemover ?? '');
     }
     print('deseja sair? (s/n)');
     String? sair = stdin.readLineSync();
